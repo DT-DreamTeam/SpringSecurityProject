@@ -6,7 +6,10 @@ import com.example.Zeta.service.impl.AdminServiceImpl;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,11 +34,15 @@ public class LoginController {
     public String loginForm(Model model){
         model.addAttribute("title","Вход");
         return "login";
-    };
+    }
 
     @RequestMapping("/index")
     public String home(Model model){
         model.addAttribute("title","Добро пожаловать!");
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+            return "redirect:/login";
+        }
         return "index";
     }
 
