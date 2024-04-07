@@ -2,6 +2,7 @@ package com.example.Zeta.controller;
 
 import com.example.Zeta.model.Category;
 import com.example.Zeta.service.CategoryService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -56,4 +57,46 @@ public class CategoryController {
     public Optional<Category> findById(Long id) {
         return categoryService.findById(id);
     }
+
+    @GetMapping("/update-category")
+    public String update(Category category, RedirectAttributes redirectAttributes) {
+        try {
+            categoryService.update(category);
+            redirectAttributes.addFlashAttribute("success", "Редактирование успешно");
+        } catch (DataIntegrityViolationException e1) {
+            e1.printStackTrace();
+            redirectAttributes.addFlashAttribute("error", "динаковое название категории");
+        } catch (Exception e2) {
+            e2.printStackTrace();
+            redirectAttributes.addFlashAttribute("error", "Error from server or duplicate name of category, please check again!");
+        }
+        return "redirect:/categories";
+    }
+
+    @RequestMapping(value = "/delete-category", method = {RequestMethod.GET, RequestMethod.PUT})
+    public String delete(Long id, RedirectAttributes redirectAttributes) {
+        try {
+            categoryService.deleteById(id);
+            redirectAttributes.addFlashAttribute("success", "Deleted successfully!");
+        } catch (Exception e2) {
+            e2.printStackTrace();
+            redirectAttributes.addFlashAttribute("error", "Error server");
+        }
+        return "redirect:/categories";
+    }
+
+    @RequestMapping(value = "/enable-category", method = {RequestMethod.PUT, RequestMethod.GET})
+    public String enable(Long id, RedirectAttributes redirectAttributes) {
+        try {
+            categoryService.enabledById(id);
+            redirectAttributes.addFlashAttribute("success", "Успешно добавлен");
+        }  catch (Exception e2) {
+            e2.printStackTrace();
+            redirectAttributes.addFlashAttribute("error", "Error server");
+        }
+        return "redirect:/categories";
+    }
+
+
+
 }
